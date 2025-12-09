@@ -17,6 +17,8 @@
             --text-color: #dcdcdc;
             --accent-color: #a31616; /* Dried Blood Red */
             --paper-color: #121212;
+            --cursor-x: 50vw;
+            --cursor-y: 50vh;
         }
 
         /* --- GLOBAL STYLES --- */
@@ -28,23 +30,33 @@
             padding: 0;
             line-height: 1.8;
             overflow-x: hidden;
+            cursor: crosshair; /* Adds to the "precision/targeting" feel */
         }
 
         /* --- ATMOSPHERE LAYERS --- */
-        .vignette {
+        
+        /* 1. The Flashlight Effect */
+        /* This creates a darkness layer that is transparent where the mouse is */
+        .flashlight-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 40%, #000000 95%);
             pointer-events: none;
             z-index: 90;
+            background: radial-gradient(
+                circle 250px at var(--cursor-x) var(--cursor-y), 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.85) 100%
+            );
+            transition: background 0.1s ease; /* Smooth movement */
         }
 
+        /* 2. Film Grain */
         .grain {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 89;
-            opacity: 0.07;
+            opacity: 0.08;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
@@ -236,15 +248,23 @@
 </head>
 <body>
 
-    <!-- VISUAL FX -->
+    <!-- VISUAL FX LAYERS -->
     <div class="grain"></div>
-    <div class="vignette"></div>
+    <div class="flashlight-layer"></div>
 
-    <!-- START SCREEN (CLICK TO START AUDIO) -->
+    <!-- AUDIO ELEMENT (PIANO) -->
+    <!-- Using Wikimedia Commons for reliability -->
+    <audio id="piano-music" loop>
+        <source src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Erik_Satie_-_Gnossienne_No._1.ogg" type="audio/ogg">
+        <!-- Fallback if browser doesn't support OGG -->
+        <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Erik_Satie_-_Gnossienne_No._1.ogg/Erik_Satie_-_Gnossienne_No._1.ogg.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- START SCREEN -->
     <div id="start-screen" onclick="enterSite()">
         <h1>THE NEGATIVE SPACE</h1>
-        <p>CLICK TO ENTER</p>
-        <span style="margin-top:20px; font-size: 0.7rem; color: #555;">(Sound Enabled)</span>
+        <p>ENTER THE DARKROOM</p>
+        <span style="margin-top:20px; font-size: 0.7rem; color: #555;">(Headphones Recommended)</span>
     </div>
 
     <div class="container">
@@ -297,98 +317,84 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- 1. GENERATIVE AUDIO ENGINE (Web Audio API) ---
-        // This creates sound using code, so no files are needed.
+        // --- 1. MOUSE FLASHLIGHT EFFECT ---
+        document.addEventListener('mousemove', (e) => {
+            const root = document.documentElement;
+            // Update CSS variables with mouse position
+            root.style.setProperty('--cursor-x', e.clientX + "px");
+            root.style.setProperty('--cursor-y', e.clientY + "px");
+        });
+
+        // --- 2. AUDIO ENGINE (NOISE + PIANO) ---
         let audioContext;
         
         function initAudio() {
-            // Create Audio Context
+            // A. GENERATE WHITE NOISE / DRONE
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioContext = new AudioContext();
 
-            // 1. Create a Low Drone (The "Hum")
+            // Drone (Humming sound)
             const osc1 = audioContext.createOscillator();
-            const osc2 = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-
             osc1.type = 'sine';
-            osc1.frequency.value = 60; // 60Hz (Electrical hum)
-            
-            osc2.type = 'triangle';
-            osc2.frequency.value = 58; // Slightly off to create a "beat"
-
-            // Connect Oscillators to Volume
+            osc1.frequency.value = 60; // 60Hz hum
             osc1.connect(gainNode);
-            osc2.connect(gainNode);
-            
-            // Set Volume (Low and ambient)
-            gainNode.gain.value = 0.05; 
+            gainNode.gain.value = 0.05; // Low volume
             gainNode.connect(audioContext.destination);
-
-            // Start the hum
             osc1.start();
-            osc2.start();
 
-            // 2. Create "Pink Noise" (The "Air/Vent" sound)
-            const bufferSize = audioContext.sampleRate * 2; // 2 seconds buffer
+            // Pink Noise (Air sound)
+            const bufferSize = audioContext.sampleRate * 2;
             const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
             const data = buffer.getChannelData(0);
-
+            let lastOut = 0;
             for (let i = 0; i < bufferSize; i++) {
-                // Generate White Noise
                 const white = Math.random() * 2 - 1; 
-                // Approximate Pink Noise (Softer, deeper)
                 data[i] = (lastOut + (0.02 * white)) / 1.02;
                 lastOut = data[i];
                 data[i] *= 3.5; 
             }
-
             const noise = audioContext.createBufferSource();
             noise.buffer = buffer;
             noise.loop = true;
-
             const noiseGain = audioContext.createGain();
-            noiseGain.gain.value = 0.03; // Very quiet hiss
-
+            noiseGain.gain.value = 0.02; // Very subtle hiss
             noise.connect(noiseGain);
             noiseGain.connect(audioContext.destination);
             noise.start();
-        }
-        
-        let lastOut = 0; // Helper for pink noise algorithm
 
-        // --- 2. ENTER SITE INTERACTION ---
+            // B. PLAY PIANO TRACK
+            const piano = document.getElementById('piano-music');
+            piano.volume = 0.5; // 50% Volume so it blends with the noise
+            piano.play().catch(e => console.log("Piano blocked until interaction"));
+        }
+
+        // --- 3. ENTER SITE INTERACTION ---
         function enterSite() {
             const startScreen = document.getElementById('start-screen');
             
-            // Start the Audio
+            // Start Audio
             try {
                 initAudio();
-                if (audioContext.state === 'suspended') {
+                if (audioContext && audioContext.state === 'suspended') {
                     audioContext.resume();
                 }
-            } catch (e) {
-                console.log("Audio Error:", e);
-            }
+            } catch (e) { console.log(e); }
 
-            // Fade out the screen
+            // Fade out screen
             startScreen.style.opacity = '0';
-            setTimeout(() => {
-                startScreen.style.display = 'none';
-            }, 1500);
+            setTimeout(() => { startScreen.style.display = 'none'; }, 1500);
         }
 
-        // --- 3. SCROLL REVEAL ANIMATION ---
+        // --- 4. SCROLL ANIMATIONS ---
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('visible');
             });
         });
         document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
 
-        // --- 4. GLITCH EFFECT ---
+        // --- 5. GLITCH EFFECT ---
         const title = document.getElementById('main-title');
         function randomGlitch() {
             title.classList.add('glitch-effect');
