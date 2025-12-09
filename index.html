@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Negative Space | A Web Novel</title>
     
-    <!-- Importing Google Fonts for that "Typewriter" and "Noir" look -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
     <style>
-        /* --- CSS STYLES --- */
+        /* --- CSS VARIABLES --- */
         :root {
-            --bg-color: #0a0a0a;
-            --text-color: #e0e0e0;
-            --accent-color: #c92a2a; /* Blood Red */
-            --paper-color: #1a1a1a;
+            --bg-color: #050505;
+            --text-color: #dcdcdc;
+            --accent-color: #a31616; /* Darker, dried blood red */
+            --paper-color: #121212;
         }
 
+        /* --- GLOBAL STYLES --- */
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -26,206 +27,359 @@
             margin: 0;
             padding: 0;
             line-height: 1.8;
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
-        /* Container to center content like a book page */
+        /* --- ATMOSPHERE LAYERS --- */
+        
+        /* 1. Vignette (Dark corners) */
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 40%, #000000 95%);
+            pointer-events: none; /* Let clicks pass through */
+            z-index: 90;
+        }
+
+        /* 2. Film Grain (Static noise) */
+        .grain {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 89;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* --- START SCREEN (OVERLAY) --- */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1.5s ease;
+            cursor: pointer;
+        }
+
+        #start-screen h1 {
+            font-family: 'Special Elite', monospace;
+            color: #fff;
+            font-size: 2rem;
+            animation: pulse 3s infinite;
+        }
+
+        #start-screen p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-family: 'Special Elite', monospace;
+        }
+
+        /* --- MAIN CONTAINER --- */
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px;
+            position: relative;
+            z-index: 10; /* Above the background effects */
         }
 
-        /* HEADER STYLES */
+        /* --- TYPOGRAPHY & ANIMATIONS --- */
         header {
             text-align: center;
-            margin-bottom: 60px;
-            border-bottom: 1px solid #333;
+            margin-bottom: 80px;
             padding-bottom: 40px;
+            border-bottom: 1px solid #222;
         }
 
-        h1 {
+        h1.title {
             font-family: 'Special Elite', monospace;
             font-size: 3.5rem;
             margin: 0;
             letter-spacing: -2px;
-            position: relative;
             color: #fff;
             text-transform: uppercase;
+            position: relative;
+            display: inline-block;
         }
 
-        /* The Glitch Animation Effect */
-        h1:hover {
-            animation: glitch 0.5s infinite;
+        /* The Glitch Class (Applied via JS randomly) */
+        .glitch-effect {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
             color: var(--accent-color);
-            cursor: default;
         }
 
         .subtitle {
             font-family: 'Special Elite', monospace;
-            color: #888;
+            color: #666;
             font-size: 1.2rem;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        /* SYNOPSIS BOX */
+        /* --- CONTENT BOXES --- */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .synopsis {
             background-color: var(--paper-color);
-            padding: 30px;
-            border-left: 4px solid var(--accent-color);
-            margin-bottom: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 40px;
+            border-left: 2px solid #333;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .synopsis h2 {
             font-family: 'Special Elite', monospace;
-            margin-top: 0;
-            color: var(--accent-color);
+            color: var(--text-color);
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 10px;
+            display: inline-block;
         }
 
-        /* EVIDENCE / FORESHADOWING SECTION */
+        /* --- EVIDENCE BOARD --- */
         .evidence-board {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 50px;
+            gap: 30px;
+            margin-bottom: 80px;
         }
 
         .note {
-            border: 1px dashed #444;
-            padding: 15px;
+            border: 1px solid #333;
+            padding: 20px;
             font-family: 'Special Elite', monospace;
-            font-size: 0.9rem;
-            background: #111;
+            font-size: 0.95rem;
+            background: #0d0d0d;
+            position: relative;
+            transition: transform 0.3s ease;
         }
 
-        /* CHAPTER LIST */
-        .chapter-list {
-            list-style: none;
-            padding: 0;
+        .note:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(163, 22, 22, 0.2);
         }
+
+        .note::before {
+            content: "EVIDENCE";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        /* --- CHAPTER LIST --- */
+        .chapter-list { list-style: none; padding: 0; }
 
         .chapter-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #141414;
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(20, 20, 20, 0.6);
+            border-left: 1px solid #333;
+            transition: all 0.4s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid #222;
         }
 
         .chapter-item:hover {
-            background: #1f1f1f;
-            border-color: var(--accent-color);
-            transform: translateX(10px);
+            background: #1a1a1a;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 25px;
         }
 
         .chapter-link {
             text-decoration: none;
             color: var(--text-color);
-            font-weight: bold;
-            font-size: 1.1rem;
-            flex-grow: 1;
+            font-family: 'Lora', serif;
+            font-size: 1.2rem;
         }
 
         .status {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-family: 'Special Elite', monospace;
             padding: 4px 8px;
-            border-radius: 4px;
+            letter-spacing: 1px;
         }
+        .status.available { color: #555; border: 1px solid #333; }
+        .status.locked { color: #333; border: 1px dashed #333; }
 
-        .status.available { color: #4caf50; border: 1px solid #4caf50; }
-        .status.locked { color: #666; border: 1px solid #666; }
-
-        /* FOOTER */
+        /* --- FOOTER --- */
         footer {
             text-align: center;
-            margin-top: 80px;
+            margin-top: 100px;
             font-size: 0.8rem;
-            color: #555;
+            color: #444;
             font-family: 'Special Elite', monospace;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 600px) {
-            h1 { font-size: 2.5rem; }
-            .evidence-board { grid-template-columns: 1fr; }
+        /* --- KEYFRAMES --- */
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
         }
 
-        /* ANIMATIONS */
         @keyframes glitch {
             0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
             100% { transform: translate(0); }
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            h1.title { font-size: 2.2rem; }
+            .evidence-board { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- ATMOSPHERE AUDIO -->
+    <!-- I've selected a free "Dark Ambience/Drone" sound. Loops forever. -->
+    <audio id="bg-music" loop>
+        <source src="https://cdn.freesound.org/previews/264/264020_3686367-lq.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- ATMOSPHERE VISUALS -->
+    <div class="grain"></div>
+    <div class="vignette"></div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" onclick="enterSite()">
+        <h1>ENTER THE DARKROOM</h1>
+        <p>[ Click anywhere to begin ]</p>
+        <p style="font-size: 0.7rem; color: #444; margin-top: 30px;">(Headphones Recommended)</p>
+    </div>
+
+    <!-- MAIN CONTENT -->
     <div class="container">
-        <header>
-            <!-- Hover over the title to see the effect -->
-            <h1>The Negative Space</h1>
+        <header class="reveal-on-scroll">
+            <h1 class="title" id="main-title">The Negative Space</h1>
             <div class="subtitle">A Novel by [Your Name]</div>
         </header>
 
-        <section class="synopsis">
+        <section class="synopsis reveal-on-scroll">
             <h2>The Campus Has Eyes</h2>
             <p>Mia Corcoran is studying photography at Blackwood University. She’s looking for art. Instead, she finds a pattern.</p>
             <p>A blurred figure in the background of a photo taken yesterday. The same figure in an archive scan from 2003. The same figure in a yearbook from 1995. He hasn't aged a day.</p>
             <p>As Mia hunts for this "ghost," the vent in her dorm room begins to rattle. Items go missing. And she realizes: <strong>He isn't haunting the campus. He’s living in it.</strong></p>
         </section>
 
-        <section class="evidence-board">
+        <section class="evidence-board reveal-on-scroll">
             <div class="note">
-                <strong>EXHIBIT A: THE DRAFT</strong><br>
+                <strong>EXHIBIT A: THE DRAFT</strong><br><br>
                 "Maintenance says the windows are sealed. So why is the air moving directly above my bed?"
             </div>
             <div class="note">
-                <strong>EXHIBIT B: THE SMELL</strong><br>
+                <strong>EXHIBIT B: THE SMELL</strong><br><br>
                 "Old paper and ozone. It smells like the library basement. Why does my pillow smell like it too?"
             </div>
         </section>
 
-        <section id="chapters">
-            <h2 style="font-family: 'Special Elite'; border-bottom: 1px solid #333; padding-bottom: 10px;">Table of Contents</h2>
+        <section id="chapters" class="reveal-on-scroll">
+            <h2 style="font-family: 'Special Elite'; color: #666; font-size: 1rem; margin-bottom: 20px;">CASE FILES (CHAPTERS)</h2>
             
             <ul class="chapter-list">
-                <!-- Chapter 1 -->
                 <li class="chapter-item">
-                    <a href="#" class="chapter-link" onclick="alert('Chapter 1 content would go here!')">Chapter 1: The Darkroom</a>
+                    <a href="#" class="chapter-link">I. The Darkroom</a>
                     <span class="status available">READ</span>
                 </li>
-
-                <!-- Chapter 2 -->
                 <li class="chapter-item">
-                    <a href="#" class="chapter-link" onclick="alert('Chapter 2 content would go here!')">Chapter 2: The Archive</a>
+                    <a href="#" class="chapter-link">II. The Archive</a>
                     <span class="status available">READ</span>
                 </li>
-
-                <!-- Chapter 3 (Locked) -->
                 <li class="chapter-item">
-                    <div class="chapter-link" style="color: #666;">Chapter 3: Paranoia</div>
+                    <div class="chapter-link" style="color: #444;">III. Paranoia</div>
                     <span class="status locked">LOCKED</span>
                 </li>
-
-                <!-- Chapter 4 (Locked) -->
                 <li class="chapter-item">
-                    <div class="chapter-link" style="color: #666;">Chapter 4: The Pattern</div>
+                    <div class="chapter-link" style="color: #444;">IV. The Pattern</div>
                     <span class="status locked">LOCKED</span>
                 </li>
             </ul>
         </section>
 
-        <footer>
-            <p>&copy; 2025 The Negative Space. <br>Don't look in the vents.</p>
+        <footer class="reveal-on-scroll">
+            <p>&copy; 2025 The Negative Space.</p>
+            <p style="opacity: 0.3;">Don't look in the vents.</p>
         </footer>
     </div>
 
+    <!-- JAVASCRIPT FOR INTERACTION -->
+    <script>
+        // 1. ENTER SITE FUNCTION
+        function enterSite() {
+            var startScreen = document.getElementById('start-screen');
+            var audio = document.getElementById('bg-music');
+            
+            // Fade out the start screen
+            startScreen.style.opacity = '0';
+            
+            // Allow pointer events on the site behind it
+            setTimeout(function() {
+                startScreen.style.display = 'none';
+            }, 1500);
+
+            // Play Audio (Volume set low for atmosphere)
+            audio.volume = 0.3; 
+            audio.play().catch(error => {
+                console.log("Audio play failed (user interaction policy): ", error);
+            });
+        }
+
+        // 2. SCROLL REVEAL (Fades elements in as you scroll)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        });
+
+        const hiddenElements = document.querySelectorAll('.reveal-on-scroll');
+        hiddenElements.forEach((el) => observer.observe(el));
+
+        // 3. RANDOM TITLE GLITCH
+        const title = document.getElementById('main-title');
+        
+        // Function to trigger a glitch randomly
+        function randomGlitch() {
+            // Add the glitch class
+            title.classList.add('glitch-effect');
+            
+            // Remove it after 200ms
+            setTimeout(() => {
+                title.classList.remove('glitch-effect');
+            }, 200);
+
+            // Schedule the next glitch (random time between 2 to 10 seconds)
+            let randomTime = Math.random() * (10000 - 2000) + 2000;
+            setTimeout(randomGlitch, randomTime);
+        }
+
+        // Start the glitch loop
+        setTimeout(randomGlitch, 3000);
+
+    </script>
 </body>
 </html>
