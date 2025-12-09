@@ -36,7 +36,6 @@
         /* --- ATMOSPHERE LAYERS --- */
         
         /* 1. The Flashlight Effect */
-        /* This creates a darkness layer that is transparent where the mouse is */
         .flashlight-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -47,17 +46,18 @@
                 rgba(0,0,0,0) 0%, 
                 rgba(0,0,0,0.85) 100%
             );
-            transition: background 0.1s ease; /* Smooth movement */
+            transition: background 0.1s ease;
         }
 
-        /* 2. Film Grain */
+        /* 2. Film Grain (FIXED THIS SECTION) */
         .grain {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 89;
             opacity: 0.08;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='[...] )
+            /* The line below was broken in your previous code. It is fixed now. */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         /* --- START SCREEN --- */
@@ -218,6 +218,9 @@
             color: var(--text-color);
             font-family: 'Lora', serif;
             font-size: 1.2rem;
+            /* Ensures the link works */
+            display: block;
+            width: 100%; 
         }
 
         .status {
