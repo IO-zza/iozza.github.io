@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter I: The Darkroom</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- STYLE SETTINGS (Same as Home) --- */
+        :root {
+            --bg-color: #050505;
+            --text-color: #dcdcdc;
+            --accent-color: #a31616;
+            --cursor-x: 50vw;
+            --cursor-y: 50vh;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Lora', serif;
+            margin: 0;
+            padding: 0;
+            line-height: 2;
+            font-size: 1.15rem;
+            cursor: text;
+        }
+
+        /* --- VISUAL FX --- */
+        /* Flashlight */
+        .flashlight-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 90;
+            background: radial-gradient(circle 350px at var(--cursor-x) var(--cursor-y), rgba(0,0,0,0) 0%, rgba(0,0,0,0.95) 100%);
+        }
+        /* Grain */
+        .grain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 89; opacity: 0.06;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* --- LAYOUT --- */
+        .book-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 80px 20px 150px 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- TEXT STYLES --- */
+        .nav-top {
+            margin-bottom: 60px;
+            font-family: 'Special Elite', monospace;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .nav-top a { color: #666; text-decoration: none; border-bottom: 1px solid #333; transition: 0.3s; }
+        .nav-top a:hover { color: var(--accent-color); border-color: var(--accent-color); }
+
+        h1 {
+            font-family: 'Special Elite', monospace;
+            font-size: 3rem;
+            color: #fff;
+            margin: 10px 0 30px 0;
+            line-height: 1;
+        }
+        .chapter-number {
+            color: var(--accent-color);
+            font-family: 'Special Elite', monospace;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .story-text p {
+            margin-bottom: 28px;
+            text-align: justify;
+        }
+        
+        /* Drop Cap */
+        .story-text p:first-of-type::first-letter {
+            font-family: 'Special Elite', monospace;
+            font-size: 4rem;
+            float: left;
+            margin-right: 12px;
+            margin-top: -10px;
+            line-height: 0.8;
+            color: var(--accent-color);
+        }
+
+        /* --- FOOTER NAV --- */
+        .nav-bottom {
+            margin-top: 100px;
+            border-top: 1px solid #333;
+            padding-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Special Elite', monospace;
+        }
+        .nav-btn {
+            color: #dcdcdc;
+            text-decoration: none;
+            border: 1px solid #333;
+            padding: 15px 25px;
+            transition: 0.3s;
+            background: #0a0a0a;
+        }
+        .nav-btn:hover { border-color: var(--accent-color); }
+
+        /* --- OVERLAY --- */
+        #read-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 999;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: opacity 0.8s;
+        }
+        #read-overlay p {
+            font-family: 'Special Elite'; color: #888; border: 1px solid #444; padding: 10px 20px;
+        }
+        #read-overlay:hover p { color: #fff; border-color: var(--accent-color); }
+
+    </style>
+</head>
+<body>
+
+    <div class="grain"></div>
+    <div class="flashlight-layer"></div>
+
+    <!-- AUDIO SOURCE -->
+    <audio id="piano-music" loop>
+        <source src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Erik_Satie_-_Gnossienne_No._1.ogg" type="audio/ogg">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c4/Erik_Satie_-_Gnossienne_No._1.ogg/Erik_Satie_-_Gnossienne_No._1.ogg.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- CLICK TO START -->
+    <div id="read-overlay" onclick="startReading()">
+        <p>CLICK TO READ CHAPTER I</p>
+    </div>
+
+    <div class="book-container">
+        <!-- NAVIGATION -->
+        <div class="nav-top">
+            <a href="index.html">← RETURN TO ARCHIVE</a>
+        </div>
+
+        <!-- HEADER -->
+        <div class="chapter-number">Chapter 01</div>
+        <h1>The Darkroom</h1>
+        <hr style="border: 0; border-bottom: 1px solid #333; margin-bottom: 50px;">
+
+        <!-- STORY CONTENT -->
+        <div class="story-text">
+            <p>
+                The red light of the darkroom always made Mia feel like she was submerged underwater. It was a silence that felt heavy, smelling of sharp vinegar and chemical fixative. She stood over the plastic trays, holding the tongs gently, agitating the liquid with a rhythmic sloshing sound.
+            </p>
+            <p>
+                "Come on," she whispered to the empty room.
+            </p>
+            <p>
+                The clock on the wall ticked. 3:00 AM.
+            </p>
+            <p>
+                Blackwood University was famous for its architecture—Gothic spires, sprawling quads, and shadows that stretched too long in the afternoon sun. Mia was here on a scholarship, her thesis titled "The Architecture of Loneliness." She had spent the last week photographing the campus at dawn, specifically capturing the moments when the mist clung to the brickwork and the students were still asleep.
+            </p>
+            <p>
+                The image in the tray began to ghost its way onto the paper. First the shadows, deep and black. Then the mid-tones. It was a wide shot of the library steps. The contrast was high; the stone looked like charcoal, the sky a bleached white.
+            </p>
+            <p>
+                Mia frowned, leaning closer. The red safe-light cast eerie shadows across her face.
+            </p>
+            <p>
+                There was someone in the photo.
+            </p>
+            <p>
+                She hadn't seen anyone when she took the shot. She was sure of it. The quad had been empty. But there, standing near the great oak doors of the library, was a figure.
+            </p>
+            <p>
+                She lifted the print with the tongs, dripping chemical tears back into the tray, and clipped it to the drying line. She grabbed her loupe magnifier and peered through the glass.
+            </p>
+            <p>
+                The figure was blurred, as if moving at high speed, or vibrating. But the stance was distinct. Hands in pockets. Shoulders hunched forward. He was wearing a heavy, oversized military jacket that looked wildly out of place for the warm September weather.
+            </p>
+            <p>
+                He was staring directly at the camera lens.
+            </p>
+            <p>
+                A chill ran down Mia's spine, entirely separate from the damp cold of the basement. It wasn't just that he was there. It was that he noticed her. In a campus of five thousand students, she had felt invisible until this moment.
+            </p>
+            <p>
+                *Clank.*
+            </p>
+            <p>
+                The sound came from directly above her head. She froze. The ventilation shaft ran along the ceiling, a massive metal gut of the building.
+            </p>
+            <p>
+                *Hiss.*
+            </p>
+            <p>
+                She looked up. The grate was screwed tight, covered in years of grey dust. But for a second, she thought she saw the dust move. Not from air pressure. It looked like the dust was being disturbed from the *inside*.
+            </p>
+            <p>
+                "Hello?" she called out. Her voice sounded thin in the damp room.
+            </p>
+            <p>
+                Silence returned, but the feeling of privacy was gone. Mia quickly grabbed the wet photo, not waiting for it to dry. She turned off the red light, plunging the room into total darkness for a split second before she kicked the door open and scrambled into the hallway light.
+            </p>
+            <p>
+                She didn't look back at the vent. If she had, she might have seen the screw slowly, silently turning.
+            </p>
+        </div>
+
+        <!-- FOOTER NAV -->
+        <div class="nav-bottom">
+            <a href="index.html" class="nav-btn">Home</a>
+            <span class="nav-btn" style="opacity: 0.5; cursor: not-allowed; border-style: dashed;">Next Case File (Locked)</span> 
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. FLASHLIGHT EFFECT
+        document.addEventListener('mousemove', (e) => {
+            document.documentElement.style.setProperty('--cursor-x', e.clientX + "px");
+            document.documentElement.style.setProperty('--cursor-y', e.clientY + "px");
+        });
+
+        // 2. AUDIO ENGINE
+        function startReading() {
+            const overlay = document.getElementById('read-overlay');
+            const piano = document.getElementById('piano-music');
+            
+            // Fade out overlay
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 800);
+
+            // A. WEB AUDIO NOISE (The Hum)
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioContext = new AudioContext();
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine'; 
+            osc.frequency.value = 60; // 60Hz hum
+            osc.connect(gain); 
+            gain.gain.value = 0.05; 
+            gain.connect(audioContext.destination); 
+            osc.start();
+
+            // Pink Noise (Air)
+            const bufferSize = audioContext.sampleRate * 2;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            let lastOut = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1; 
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = data[i];
+                data[i] *= 3.5; 
+            }
+            const noise = audioContext.createBufferSource();
+            noise.buffer = buffer;
+            noise.loop = true;
+            const noiseGain = audioContext.createGain();
+            noiseGain.gain.value = 0.025; 
+            noise.connect(noiseGain);
+            noiseGain.connect(audioContext.destination);
+            noise.start();
+
+            // B. PLAY PIANO
+            piano.volume = 0.4;
+            piano.play();
+        }
+    </script>
+</body>
+</html>
