@@ -15,7 +15,7 @@
         :root {
             --bg-color: #050505;
             --text-color: #dcdcdc;
-            --accent-color: #a31616; /* Darker, dried blood red */
+            --accent-color: #a31616; /* Dried Blood Red */
             --paper-color: #121212;
         }
 
@@ -27,31 +27,28 @@
             margin: 0;
             padding: 0;
             line-height: 1.8;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden;
         }
 
         /* --- ATMOSPHERE LAYERS --- */
-        
-        /* 1. Vignette (Dark corners) */
         .vignette {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, transparent 40%, #000000 95%);
-            pointer-events: none; /* Let clicks pass through */
+            pointer-events: none;
             z-index: 90;
         }
 
-        /* 2. Film Grain (Static noise) */
         .grain {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 89;
-            opacity: 0.05;
+            opacity: 0.07;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* --- START SCREEN (OVERLAY) --- */
+        /* --- START SCREEN --- */
         #start-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -70,13 +67,25 @@
             color: #fff;
             font-size: 2rem;
             animation: pulse 3s infinite;
+            text-align: center;
+            padding: 0 20px;
         }
 
         #start-screen p {
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 10px;
+            color: #888;
+            font-size: 1rem;
+            margin-top: 20px;
             font-family: 'Special Elite', monospace;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        #start-screen:hover p {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
         }
 
         /* --- MAIN CONTAINER --- */
@@ -85,10 +94,10 @@
             margin: 0 auto;
             padding: 60px 20px;
             position: relative;
-            z-index: 10; /* Above the background effects */
+            z-index: 10;
         }
 
-        /* --- TYPOGRAPHY & ANIMATIONS --- */
+        /* --- TYPOGRAPHY --- */
         header {
             text-align: center;
             margin-bottom: 80px;
@@ -107,10 +116,10 @@
             display: inline-block;
         }
 
-        /* The Glitch Class (Applied via JS randomly) */
         .glitch-effect {
             animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
             color: var(--accent-color);
+            text-shadow: 2px 2px #ff0000;
         }
 
         .subtitle {
@@ -120,18 +129,7 @@
             margin-top: 15px;
         }
 
-        /* --- CONTENT BOXES --- */
-        .reveal-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 1s ease-out;
-        }
-
-        .reveal-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        /* --- SECTIONS --- */
         .synopsis {
             background-color: var(--paper-color);
             padding: 40px;
@@ -183,7 +181,7 @@
             color: #666;
         }
 
-        /* --- CHAPTER LIST --- */
+        /* --- CHAPTERS --- */
         .chapter-list { list-style: none; padding: 0; }
 
         .chapter-item {
@@ -219,59 +217,36 @@
         .status.available { color: #555; border: 1px solid #333; }
         .status.locked { color: #333; border: 1px dashed #333; }
 
-        /* --- FOOTER --- */
         footer {
             text-align: center;
             margin-top: 100px;
-            font-size: 0.8rem;
             color: #444;
             font-family: 'Special Elite', monospace;
         }
 
-        /* --- KEYFRAMES --- */
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
+        /* --- ANIMATIONS --- */
+        .reveal-on-scroll { opacity: 0; transform: translateY(30px); transition: all 1s ease-out; }
+        .reveal-on-scroll.visible { opacity: 1; transform: translateY(0); }
 
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-3px, 3px); }
-            40% { transform: translate(-3px, -3px); }
-            60% { transform: translate(3px, 3px); }
-            80% { transform: translate(3px, -3px); }
-            100% { transform: translate(0); }
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 600px) {
-            h1.title { font-size: 2.2rem; }
-            .evidence-board { grid-template-columns: 1fr; }
-        }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-3px, 3px); } 40% { transform: translate(-3px, -3px); } 60% { transform: translate(3px, 3px); } 80% { transform: translate(3px, -3px); } 100% { transform: translate(0); } }
+        
+        @media (max-width: 600px) { h1.title { font-size: 2.2rem; } .evidence-board { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <!-- ATMOSPHERE AUDIO -->
-    <!-- I've selected a free "Dark Ambience/Drone" sound. Loops forever. -->
-    <audio id="bg-music" loop>
-        <source src="https://cdn.freesound.org/previews/264/264020_3686367-lq.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <!-- ATMOSPHERE VISUALS -->
+    <!-- VISUAL FX -->
     <div class="grain"></div>
     <div class="vignette"></div>
 
-    <!-- START SCREEN -->
+    <!-- START SCREEN (CLICK TO START AUDIO) -->
     <div id="start-screen" onclick="enterSite()">
-        <h1>ENTER THE DARKROOM</h1>
-        <p>[ Click anywhere to begin ]</p>
-        <p style="font-size: 0.7rem; color: #444; margin-top: 30px;">(Headphones Recommended)</p>
+        <h1>THE NEGATIVE SPACE</h1>
+        <p>CLICK TO ENTER</p>
+        <span style="margin-top:20px; font-size: 0.7rem; color: #555;">(Sound Enabled)</span>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="container">
         <header class="reveal-on-scroll">
             <h1 class="title" id="main-title">The Negative Space</h1>
@@ -297,11 +272,11 @@
         </section>
 
         <section id="chapters" class="reveal-on-scroll">
-            <h2 style="font-family: 'Special Elite'; color: #666; font-size: 1rem; margin-bottom: 20px;">CASE FILES (CHAPTERS)</h2>
+            <h2 style="font-family: 'Special Elite'; color: #666; font-size: 1rem; margin-bottom: 20px;">CASE FILES</h2>
             
             <ul class="chapter-list">
                 <li class="chapter-item">
-                    <a href="#" class="chapter-link">I. The Darkroom</a>
+                    <a href="#" class="chapter-link" onclick="alert('Link your chapter here!')">I. The Darkroom</a>
                     <span class="status available">READ</span>
                 </li>
                 <li class="chapter-item">
@@ -312,42 +287,98 @@
                     <div class="chapter-link" style="color: #444;">III. Paranoia</div>
                     <span class="status locked">LOCKED</span>
                 </li>
-                <li class="chapter-item">
-                    <div class="chapter-link" style="color: #444;">IV. The Pattern</div>
-                    <span class="status locked">LOCKED</span>
-                </li>
             </ul>
         </section>
 
         <footer class="reveal-on-scroll">
-            <p>&copy; 2025 The Negative Space.</p>
-            <p style="opacity: 0.3;">Don't look in the vents.</p>
+            <p>&copy; 2025 The Negative Space.<br>Don't look in the vents.</p>
         </footer>
     </div>
 
-    <!-- JAVASCRIPT FOR INTERACTION -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // 1. ENTER SITE FUNCTION
+        // --- 1. GENERATIVE AUDIO ENGINE (Web Audio API) ---
+        // This creates sound using code, so no files are needed.
+        let audioContext;
+        
+        function initAudio() {
+            // Create Audio Context
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContext();
+
+            // 1. Create a Low Drone (The "Hum")
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            osc1.type = 'sine';
+            osc1.frequency.value = 60; // 60Hz (Electrical hum)
+            
+            osc2.type = 'triangle';
+            osc2.frequency.value = 58; // Slightly off to create a "beat"
+
+            // Connect Oscillators to Volume
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            
+            // Set Volume (Low and ambient)
+            gainNode.gain.value = 0.05; 
+            gainNode.connect(audioContext.destination);
+
+            // Start the hum
+            osc1.start();
+            osc2.start();
+
+            // 2. Create "Pink Noise" (The "Air/Vent" sound)
+            const bufferSize = audioContext.sampleRate * 2; // 2 seconds buffer
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                // Generate White Noise
+                const white = Math.random() * 2 - 1; 
+                // Approximate Pink Noise (Softer, deeper)
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = data[i];
+                data[i] *= 3.5; 
+            }
+
+            const noise = audioContext.createBufferSource();
+            noise.buffer = buffer;
+            noise.loop = true;
+
+            const noiseGain = audioContext.createGain();
+            noiseGain.gain.value = 0.03; // Very quiet hiss
+
+            noise.connect(noiseGain);
+            noiseGain.connect(audioContext.destination);
+            noise.start();
+        }
+        
+        let lastOut = 0; // Helper for pink noise algorithm
+
+        // --- 2. ENTER SITE INTERACTION ---
         function enterSite() {
-            var startScreen = document.getElementById('start-screen');
-            var audio = document.getElementById('bg-music');
+            const startScreen = document.getElementById('start-screen');
             
-            // Fade out the start screen
+            // Start the Audio
+            try {
+                initAudio();
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+            } catch (e) {
+                console.log("Audio Error:", e);
+            }
+
+            // Fade out the screen
             startScreen.style.opacity = '0';
-            
-            // Allow pointer events on the site behind it
-            setTimeout(function() {
+            setTimeout(() => {
                 startScreen.style.display = 'none';
             }, 1500);
-
-            // Play Audio (Volume set low for atmosphere)
-            audio.volume = 0.3; 
-            audio.play().catch(error => {
-                console.log("Audio play failed (user interaction policy): ", error);
-            });
         }
 
-        // 2. SCROLL REVEAL (Fades elements in as you scroll)
+        // --- 3. SCROLL REVEAL ANIMATION ---
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
@@ -355,29 +386,15 @@
                 }
             });
         });
+        document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
 
-        const hiddenElements = document.querySelectorAll('.reveal-on-scroll');
-        hiddenElements.forEach((el) => observer.observe(el));
-
-        // 3. RANDOM TITLE GLITCH
+        // --- 4. GLITCH EFFECT ---
         const title = document.getElementById('main-title');
-        
-        // Function to trigger a glitch randomly
         function randomGlitch() {
-            // Add the glitch class
             title.classList.add('glitch-effect');
-            
-            // Remove it after 200ms
-            setTimeout(() => {
-                title.classList.remove('glitch-effect');
-            }, 200);
-
-            // Schedule the next glitch (random time between 2 to 10 seconds)
-            let randomTime = Math.random() * (10000 - 2000) + 2000;
-            setTimeout(randomGlitch, randomTime);
+            setTimeout(() => { title.classList.remove('glitch-effect'); }, 200);
+            setTimeout(randomGlitch, Math.random() * (10000 - 2000) + 2000);
         }
-
-        // Start the glitch loop
         setTimeout(randomGlitch, 3000);
 
     </script>
